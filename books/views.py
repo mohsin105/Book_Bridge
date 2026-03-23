@@ -3,8 +3,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.viewsets import ModelViewSet
-from books.models import Category, Tag, Book, BookCopy
-from books.serializers import CategorySerializer, TagSerializer, BookSerializer, BookCopySerializer, BookCopyCreateSerializer
+from books.models import Category, Tag, Book, BookCopy, BookReview
+from books.serializers import CategorySerializer, TagSerializer, BookSerializer, BookCopySerializer, BookCopyCreateSerializer, BookReviewSerializer, BookReviewCreateSerializer
 from rest_framework import status
 # Create your views here.
 
@@ -107,9 +107,13 @@ class BookView(ModelViewSet):
 """ BookCopy Model CRUD --------------->      """
 
 class BookCopyListView(ListCreateAPIView):
-    queryset = BookCopy.objects.select_related('book').select_related('owner').all()
+    # queryset = BookCopy.objects.select_related('book').select_related('owner').all()
     serializer_class = BookCopySerializer
     
+    def get_queryset(self):
+        book_id = self.kwargs.get('id')
+        print('Book Id :',book_id)
+        return BookCopy.objects.select_related('book').prefetch_related('owner').filter(book_id = book_id)
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -117,9 +121,49 @@ class BookCopyListView(ListCreateAPIView):
         return BookCopySerializer
     
     def perform_create(self, serializer):
-        serializer.save(owner = self.request.user)
+        book_id = self.kwargs.get('id')
+        serializer.save(owner = self.request.user, book_id = book_id)
 
 class SpecificBookCopyView(RetrieveUpdateDestroyAPIView):
-    queryset = BookCopy.objects.select_related('book').select_related('owner').all()
+    # queryset = BookCopy.objects.select_related('book').select_related('owner').all()
     serializer_class = BookCopySerializer
-    lookup_field = 'copy_id'
+    lookup_field = 'pk'
+
+    def get_queryset(self):
+        book_id = self.kwargs.get('bookId')
+        return BookCopy.objects.select_related('book').prefetch_related('owner').filter(book_id = book_id)
+        # return super().get_queryset()
+
+
+""" BookReview Model CRUD --------------->      """
+
+class BookReviewListView(ListCreateAPIView):
+    # queryset = BookReview.objects.all()
+    # serializer_class = BookReviewSerializer
+
+    def get_queryset(self):
+        bookId = self.kwargs.get('id')
+        return BookReview.objects.filter(book_id = bookId )
+    
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return BookReviewCreateSerializer
+        return BookReviewSerializer
+    
+    def perform_create(self, serializer):
+        bookId = self.kwargs.get('id')
+        bookObj = get_object_or_404(Book,pk = bookId)
+        serializer.save(user = self.request.user, book = bookObj)
+
+class SpecificBookReviewView(RetrieveUpdateDestroyAPIView):
+    serializer_class = BookReviewSerializer
+    lookup_field = 'pk'
+
+    def get_queryset(self):
+        bookId = self.kwargs.get('bookId')
+        return BookReview.objects.filter(book_id = bookId)
+    
+    def get_serializer_class(self):
+        if self.request.method == 'PUT':
+            return BookReviewCreateSerializer
+        return BookReviewSerializer

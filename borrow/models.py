@@ -32,8 +32,8 @@ class BorrowRecord(models.Model):
     book_copy = models.ForeignKey(BookCopy, on_delete=models.SET_NULL,null=True, related_name = 'borrow_records')
     transaction_status = models.CharField(max_length=12, choices=STATUS, default='ACTIVE')
     borrow_date = models.DateTimeField(auto_now_add=True)
-    due_date = models.DateTimeField()
-    returned_date = models.DateTimeField()
+    due_date = models.DateTimeField(blank=True)
+    returned_date = models.DateTimeField(blank=True, null= True)
     extension_request_count = models.IntegerField(
         default=0,
         blank=True,
@@ -62,20 +62,20 @@ class BorrowRecord(models.Model):
         return f'{bookTitle} record from {ownerName} to {borrowerName}'
 
 
-# class BorrowExtensionRequest(models.Model):
-#     REQUEST_STATUS = (
-#         ('PENDING','Pending'),
-#         ('ACCEPTED','Accepted'),
-#         ('REJECTED','Rejected'),
-#         ('CANCELLED','Cancelled')
-#     )
-#     requested_by  = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='extension_requests')
-#     borrow_record = models.ForeignKey(BorrowRecord, on_delete=models.CASCADE, related_name='extension_request_list')
-#     extension_status = models.CharField(max_length=15, choices=REQUEST_STATUS, default='PENDING')
-#     requested_due_date = models.DateTimeField()
-#     message = models.TextField()
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
+class BorrowExtensionRequest(models.Model):
+    REQUEST_STATUS = (
+        ('PENDING','Pending'),
+        ('ACCEPTED','Accepted'),
+        ('REJECTED','Rejected'),
+        ('CANCELLED','Cancelled')
+    )
+    requested_by  = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='extension_requests')
+    borrow_record = models.ForeignKey(BorrowRecord, on_delete=models.CASCADE, related_name='extension_request_list')
+    extension_status = models.CharField(max_length=15, choices=REQUEST_STATUS, default='PENDING')
+    requested_due_date = models.DateTimeField()
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-#     def __init__(self):
-#         return f'{self.requested_by.first_name} on {self.borrow_record}'
+    def __init__(self):
+        return f'{self.requested_by.first_name} on {self.borrow_record}'

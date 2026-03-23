@@ -42,25 +42,25 @@ class User(AbstractUser):
 #         return f"{self.reviewed_by.first_name} reviewing {self.reviewed_user.first_name} on {self.borrow_record.book_copy.book.title}"
 
 
-# class Notification(models.Model):
-#     NOTIFICATION_TYPE = (
-#         ('borrow_request','Borrow Request'),
-#         ('request_accepted','Request Accepted'),
-#         ('request_rejected','Request Rejected'),
-#         ('book_returned','Book Returned'),
-#         ('extension_request','Extension Request'),
-#         ('extension_accepted','Extension Accepted'),
-#         ('review_received','Review Received'),
-#     )
+class Notification(models.Model):
+    NOTIFICATION_TYPE = (
+        ('borrow_request','Borrow Request'),
+        ('request_accepted','Request Accepted'),
+        ('request_rejected','Request Rejected'),
+        ('book_returned','Book Returned'),
+        ('extension_request','Extension Request'),
+        ('extension_accepted','Extension Accepted'),
+        ('review_received','Review Received'),
+    )
 
-#     notification_type = models.CharField(max_length=40, choices=NOTIFICATION_TYPE)
-#     actor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_notifications')
-#     receiver_user = models.ForeignKey(User, on_delete=models.CASCADE, default='notifications')
-#     message = models.TextField()
-#     link = models.CharField(max_length=260, blank=True, null=True)
-#     is_read = models.BooleanField(blank=True ,default=False)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
+    notification_type = models.CharField(max_length=40, choices=NOTIFICATION_TYPE)
+    actor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_notifications')
+    receiver_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    message = models.TextField()
+    link = models.CharField(max_length=260, blank=True, null=True)
+    is_read = models.BooleanField(blank=True ,default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-#     def __str_(self):
-#         return f'{self.notification_type} from {self.actor} to {self.receiver_user}'
+    def __str__(self):
+        return f'{self.notification_type} from {self.actor} to {self.receiver_user}'

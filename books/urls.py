@@ -1,5 +1,5 @@
 from django.urls import path, include
-from books.views import category_list, specific_category, tag_list, specific_tag,CategoryListView, SpecificCategoryView, TagListView, SpecificTagView, BookListView, SpecificBookView, BookCopyListView, SpecificBookCopyView
+from books.views import category_list, specific_category, tag_list, specific_tag,CategoryListView, SpecificCategoryView, TagListView, SpecificTagView, BookListView, SpecificBookView, BookCopyListView, SpecificBookCopyView, BookReviewListView, SpecificBookReviewView
 
 urlpatterns = [
     # path('categories/', category_list),
@@ -13,5 +13,7 @@ urlpatterns = [
     path('', BookListView.as_view(), name='books'),
     path('<int:id>/', SpecificBookView.as_view(), name='book-details'),
     path('<int:id>/copies/', BookCopyListView.as_view(), name='copies' ),
-    path('<int:id>/copies/<int:copy_id>/', SpecificBookCopyView.as_view(), name = 'copy-details')
+    path('<int:bookId>/copies/<int:pk>/', SpecificBookCopyView.as_view(), name = 'copy-details'),
+    path('<int:id>/reviews/', BookReviewListView.as_view(), name='reviews' ),
+    path('<int:bookId>/reviews/<int:pk>/', SpecificBookReviewView.as_view(), name='review-details')
 ]
