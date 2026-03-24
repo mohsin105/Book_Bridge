@@ -9,46 +9,11 @@ from rest_framework import status
 # Create your views here.
 
 # Category Model CRUD -----------------> 
-@api_view(['GET', 'POST'])
-def category_list(request):
-    if request.method == 'GET':
-        categories = Category.objects.all()
-        serializers = CategorySerializer(categories, many = True)
-        return Response(serializers.data)
-    
-    if request.method == 'POST':
-        serializer = CategorySerializer(data = request.data)
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-class CategoryListView(ListCreateAPIView):
+class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-
-    
-
-@api_view(['GET', 'DELETE'])
-def specific_category(request,id):
-    category = get_object_or_404(Category,pk=id)
-
-    if request.method == "GET":
-        serializer = CategorySerializer(category)
-        return Response(serializer.data)
-    
-    if request.method == "DELETE":
-        category.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class SpecificCategoryView(RetrieveDestroyAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-    lookup_field = 'id'
-
+    lookup_field = 'pk'
 
 """ Tag Model CURD --------------->     """
 
@@ -98,7 +63,7 @@ class SpecificBookView(RetrieveUpdateDestroyAPIView):
     serializer_class = BookSerializer
     lookup_field = 'id'
 
-class BookView(ModelViewSet):
+class BookViewSet(ModelViewSet):
     queryset = Book.objects.select_related('category').prefetch_related('tags').all()
     serializer_class = BookSerializer
     lookup_field = 'pk'
@@ -134,6 +99,23 @@ class SpecificBookCopyView(RetrieveUpdateDestroyAPIView):
         return BookCopy.objects.select_related('book').prefetch_related('owner').filter(book_id = book_id)
         # return super().get_queryset()
 
+class BookCopyViewSet(ModelViewSet):
+    lookup_field='pk'
+
+    def get_queryset(self):
+        if self.action == 'list':
+            pass
+        if self.action == 'retrieve':
+            pass
+        return super().get_queryset()
+    
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            pass
+        return super().get_serializer_class()
+    
+    def perform_create(self, serializer):
+        return super().perform_create(serializer)
 
 """ BookReview Model CRUD --------------->      """
 
@@ -167,3 +149,15 @@ class SpecificBookReviewView(RetrieveUpdateDestroyAPIView):
         if self.request.method == 'PUT':
             return BookReviewCreateSerializer
         return BookReviewSerializer
+
+
+class BookReviewViewSet(ModelViewSet):
+
+    def get_queryset(self):
+        return super().get_queryset()
+    
+    def get_serializer_class(self):
+        return super().get_serializer_class()
+    
+    def perform_create(self, serializer):
+        return super().perform_create(serializer)

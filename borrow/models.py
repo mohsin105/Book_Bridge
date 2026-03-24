@@ -77,5 +77,5 @@ class BorrowExtensionRequest(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __init__(self):
+    def __str__(self):
         return f'{self.requested_by.first_name} on {self.borrow_record}'

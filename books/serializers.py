@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from books.models import Category, Tag, Book, BookCopy ,BookReview
 from users.serializers import SimpleCustomUser
+from django.conf import settings
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,6 +18,11 @@ class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = ['id','title', 'category', 'tags', 'author', 'page_count', 'description', 'cover_image']
+    
+    def create(self, validated_data):
+        if not validated_data.get('cover_image'):
+            validated_data['cover_image'] = 'book_cover/default_cover.png'
+        return super().create(validated_data)
 
 class SimpleBookSerializer(serializers.ModelSerializer):
     class Meta:
