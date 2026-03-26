@@ -28,9 +28,14 @@ class BorrowRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = BorrowRecord
         fields = ['id', 'borrower','owner', 'book_copy', 'transaction_status', 'borrow_date', 'due_date', 'returned_date', 'extension_request_count', 'created_at', 'updated_at']
+        read_only_fields=['id', 'borrower','owner', 'book_copy', 'borrow_date', 'due_date', 'extension_request_count', 'created_at', 'updated_at']
         # read_only_fields = ['__all__']
 
-        read_only_fields=['id', 'borrower','owner', 'book_copy', 'borrow_date', 'due_date', 'extension_request_count', 'created_at', 'updated_at']
+class RecordUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BorrowRecord
+        fields =['id', 'transaction_status']
+
 
 
 class ExtensionRequestSerialier(serializers.ModelSerializer):

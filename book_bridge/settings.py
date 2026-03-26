@@ -136,6 +136,12 @@ SIMPLE_JWT = {
    "ACCESS_TOKEN_LIFETIME": timedelta(days=5),
 }
 
+DJOSER = {
+    'SERIALIZERS': {
+			'current_user': 'users.serializers.UserSerializer',
+		},
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
