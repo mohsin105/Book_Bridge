@@ -1,6 +1,10 @@
 from rest_framework import serializers
 from users.models import User, Notification
-from djoser.serializers import UserSerializer as BaseUserSerializer
+from djoser.serializers import UserSerializer as BaseUserSerializer, UserCreateSerializer as BaseUserCreateSerializer
+
+class UserCreateSerializer(BaseUserCreateSerializer):
+    class Meta(BaseUserCreateSerializer.Meta):
+        fields = ['id', 'email','first_name','last_name', 'phone_number', 'address', 'password']
 
 class SimpleCustomUser(serializers.ModelSerializer):
     class Meta:

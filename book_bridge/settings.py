@@ -30,6 +30,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+]
+
 
 # Application definition
 
@@ -43,6 +47,7 @@ INSTALLED_APPS = [
     "rest_framework",
     'djoser',
     'django_filters',
+    "corsheaders",
     'users',
     'books',
     'borrow',
@@ -51,6 +56,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -138,6 +144,7 @@ SIMPLE_JWT = {
 
 DJOSER = {
     'SERIALIZERS': {
+            'user_create':'users.serializers.UserCreateSerializer',
 			'current_user': 'users.serializers.UserSerializer',
 		},
 }

@@ -23,6 +23,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 
 class BorrowRequestViewSet(ModelViewSet):
+    lookup_field='pk'
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -30,13 +31,17 @@ class BorrowRequestViewSet(ModelViewSet):
         return BorrowRequest.objects.filter(Q(requested_by = self.request.user) | Q(book_copy__owner = self.request.user))
     
     def get_serializer_class(self):
-        obj = self.get_object()
-        if self.request.method in ['POST','PUT']:
+        if self.action in ['update', 'partial_update']:
+            obj = self.get_object()
             if self.request.user == obj.requested_by:
-                return RequestCreateSerializer
+                return RequestCreateSerializer #For requester to cancel the status, that field must be in serializer
             elif self.request.user == obj.book_copy.owner:
                 return RequestPatchSerializer
+        if self.request.method == "POST":
+            return RequestCreateSerializer  #No need for status field here. 
         return BorrowRequestSerializer
+            
+        # if self.request.method in ['POST','PUT']:
     
     def perform_create(self, serializer):
         requestObj = serializer.save(requested_by = self.request.user)
@@ -52,9 +57,13 @@ class BorrowRequestViewSet(ModelViewSet):
     
     def perform_update(self, serializer):
         requestObj = self.get_object()
+        # print('Requester Update Form: ',serializer.validated_data)
         # Borrower options-> 
         if self.request.user == requestObj.requested_by:
-            if serializer.validated_data.get('status') not in ['CANCELLED', 'PENDING']:
+            # print('this is the requester')
+            serializerStatus = serializer.validated_data.get('status')
+            if serializerStatus and serializerStatus not in ['CANCELLED', 'PENDING']:
+                # print('not pending nor cancelled')
                 return Response(status = status.HTTP_403_FORBIDDEN)
             serializer.save()
         
@@ -130,11 +139,13 @@ class BorrowRecordViewSet(ModelViewSet):
     # queryset = BorrowRecord.objects.all()
     # serializer_class = BorrowRecordSerializer
     lookup_field = 'pk'
+    filter_backends=[DjangoFilterBackend]
+    filterset_fields = ['borrower', 'owner']
 
     def get_queryset(self):
         qs= BorrowRecord.objects.filter(Q(borrower = self.request.user) | Q(owner = self.request.user))
         recordStatus = self.request.query_params.get('status')
-        if not recordStatus: #not all, only active ones
+        if recordStatus=='active': #not all, only active ones
             qs = qs.filter(transaction_status = 'ACTIVE')
         return qs
     
@@ -142,6 +153,14 @@ class BorrowRecordViewSet(ModelViewSet):
         if self.request.method in ['PUT']:
             return RecordUpdateSerializer
         return BorrowRecordSerializer
+    
+    def perform_update(self, serializer):
+        recordObj = self.get_object()
+        if self.request.user == recordObj.owner:
+            serializer.save()
+        else:
+            return Response(status = status.HTTP_403_FORBIDDEN)
+        # return super().perform_update(serializer)
 
 
 """ BorrowExtensionRequest CRUD operatoins-------->   """
@@ -196,16 +215,20 @@ class BorrowExtensionRequestViewSet(ModelViewSet):
     def perform_update(self, serializer):
         requestObj = self.get_object()
         recordObj = requestObj.borrow_record
+        print(serializer.validated_data)
+        submittedStatus = serializer.validated_data.get('extension_status')
         # borrower side
         if requestObj.requested_by == self.request.user:
             if requestObj.extension_status == 'REJECTED':
                 return Response(status= status.HTTP_403_FORBIDDEN)
-            if serializer.validated_data.get('extension_status') not in ['CANCELLED', 'PENDING']:
+            if submittedStatus and submittedStatus not in ['CANCELLED', 'PENDING']:
                 return Response(status = status.HTTP_403_FORBIDDEN)
             serializer.save()
         
         # owner side -> 
         elif recordObj.owner == self.request.user:
+            if submittedStatus and submittedStatus not in ['ACCEPTED', 'REJECTED']:
+                return Response(status=status.HTTP_403_FORBIDDEN)
             if serializer.validated_data.get('extension_status') == 'ACCEPTED':
                 recordObj.extension_request_count += 1
                 recordObj.due_date = requestObj.requested_due_date

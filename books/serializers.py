@@ -15,9 +15,18 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ['id','name']
 
 class BookSerializer(serializers.ModelSerializer):
+    category = CategorySerializer()
+    tags = TagSerializer(many = True)
     class Meta:
         model = Book
         fields = ['id','title', 'category', 'tags', 'author', 'page_count', 'description', 'cover_image']
+    
+    
+
+class BookCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Book
+        fields = ['id','title','category', 'tags', 'author', 'page_count', 'description', 'cover_image']
     
     def create(self, validated_data):
         if not validated_data.get('cover_image'):
@@ -44,6 +53,8 @@ class BookCopyCreateSerializer(serializers.ModelSerializer):
         fields = ['id', 'availability_status', 'book_condition', 'note']
 
 class SimpleBookCopySerializer(serializers.ModelSerializer):
+    book = SimpleBookSerializer()
+    owner = SimpleCustomUser()
     class Meta:
         model = BookCopy
         fields = ['id', 'book', 'owner', 'availability_status', 'book_condition', 'note',]

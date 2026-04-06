@@ -9,7 +9,6 @@ router.register('categories',CategoryViewSet)
 router.register('books', BookViewSet)
 router.register('tags', TagViewSet)
 router.register('borrow/requests', BorrowRequestViewSet, basename='requests')
-# router.register('records', BorrowRecordViewSet, basename='records')
 router.register('borrow/records',BorrowRecordViewSet, basename='records' )
 router.register('extensions', BorrowExtensionRequestViewSet,basename='extensions' )
 
@@ -24,7 +23,7 @@ record_router.register('extensions', BorrowExtensionRequestViewSet, basename='re
 
 urlpatterns = [
     # path('books/', include('books.urls')),
-    path('borrow/', include('borrow.urls')),
+    # path('borrow/', include('borrow.urls')),
     path('users/', include('users.urls')),
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),

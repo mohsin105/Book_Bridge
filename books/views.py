@@ -5,7 +5,7 @@ from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView, R
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.mixins import CreateModelMixin, ListModelMixin, DestroyModelMixin, RetrieveModelMixin
 from books.models import Category, Tag, Book, BookCopy, BookReview
-from books.serializers import CategorySerializer, TagSerializer, BookSerializer, BookCopySerializer, BookCopyCreateSerializer, BookReviewSerializer, BookReviewCreateSerializer
+from books.serializers import CategorySerializer, TagSerializer, BookSerializer, BookCopySerializer, BookCopyCreateSerializer, BookReviewSerializer, BookReviewCreateSerializer, BookCreateSerializer
 from rest_framework import status
 # Create your views here.
 
@@ -26,8 +26,12 @@ class TagViewSet(ListModelMixin, RetrieveModelMixin, CreateModelMixin, DestroyMo
 
 class BookViewSet(ModelViewSet):
     queryset = Book.objects.select_related('category').prefetch_related('tags').all()
-    serializer_class = BookSerializer
     lookup_field = 'pk'
+
+    def get_serializer_class(self):
+        if self.request.method in ['POST', 'PUT']:
+            return BookCreateSerializer
+        return BookSerializer
 
 
 """ BookCopy Model CRUD --------------->      """

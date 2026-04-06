@@ -2,8 +2,10 @@ from rest_framework import serializers
 from borrow.models import BorrowRequest, BorrowRecord,BorrowExtensionRequest
 from books.serializers import SimpleBookCopySerializer
 from users.serializers import SimpleCustomUser
-class BorrowRequestSerializer(serializers.ModelSerializer):
 
+class BorrowRequestSerializer(serializers.ModelSerializer):
+    book_copy = SimpleBookCopySerializer()
+    requested_by = SimpleCustomUser()
     class Meta:
         model = BorrowRequest
         fields = ['id','book_copy', 'requested_by', 'status', 'message', 'created_at', 'updated_at']
@@ -12,7 +14,7 @@ class BorrowRequestSerializer(serializers.ModelSerializer):
 class RequestCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = BorrowRequest
-        fields = ['id','book_copy', 'message', 'created_at', 'updated_at']
+        fields = ['id','book_copy','status', 'message', 'created_at', 'updated_at']
         # read_only_fields = ['requested_by']
 
 class RequestPatchSerializer(serializers.ModelSerializer):
@@ -52,4 +54,4 @@ class ExtensionCreateSerializer(serializers.ModelSerializer):
 class ExtensionPatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = BorrowExtensionRequest
-        fields =['id','extension_status']
+        fields =['id','extension_status', 'message']
