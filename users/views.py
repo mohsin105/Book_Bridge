@@ -33,5 +33,5 @@ class UserDashboard(APIView):
             'requests':requests,
             'records':records
         }
-        print(context)
+        # print(context)
         return Response(context)

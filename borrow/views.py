@@ -12,8 +12,8 @@ from users.models import Notification
 from books.models import BookCopy
 from django.conf import settings
 from django_filters.rest_framework import DjangoFilterBackend
-# from 
-# Create your views here.
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser,IsAuthenticated
+from borrow.permissions import IsAdminOrRecordOwner
 
 """  BorrowRequest CRUD operations ---------->   """
 
@@ -24,6 +24,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 class BorrowRequestViewSet(ModelViewSet):
     lookup_field='pk'
+    permission_classes=[IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -33,8 +34,10 @@ class BorrowRequestViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.action in ['update', 'partial_update']:
             obj = self.get_object()
+            # Requested Option ---> 
             if self.request.user == obj.requested_by:
                 return RequestCreateSerializer #For requester to cancel the status, that field must be in serializer
+            # Owner Option ----> 
             elif self.request.user == obj.book_copy.owner:
                 return RequestPatchSerializer
         if self.request.method == "POST":
@@ -142,6 +145,13 @@ class BorrowRecordViewSet(ModelViewSet):
     filter_backends=[DjangoFilterBackend]
     filterset_fields = ['borrower', 'owner']
 
+    def get_permissions(self):
+        if self.request.method in ['POST','DELETE']:
+            return [IsAdminUser()]
+        if self.request.method in ['PUT','PATCH']:
+            return [IsAdminOrRecordOwner()] #Only Owner|Admin can update the record
+        return [IsAuthenticated()]
+
     def get_queryset(self):
         qs= BorrowRecord.objects.filter(Q(borrower = self.request.user) | Q(owner = self.request.user))
         recordStatus = self.request.query_params.get('status')
@@ -156,6 +166,7 @@ class BorrowRecordViewSet(ModelViewSet):
     
     def perform_update(self, serializer):
         recordObj = self.get_object()
+        # Only Owner can update the Record
         if self.request.user == recordObj.owner:
             serializer.save()
         else:
@@ -175,6 +186,7 @@ class BorrowExtensionRequestViewSet(ModelViewSet):
     http_method_names = ['get', 'post','patch',  'head', 'options', 'trace']
     filter_backends = [DjangoFilterBackend]
     filterset_fields=['extension_status', 'requested_by', 'borrow_record__owner']
+    permission_classes=[IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         recordObj = self.kwargs.get('record_pk')

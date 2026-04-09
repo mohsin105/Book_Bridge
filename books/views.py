@@ -7,6 +7,11 @@ from rest_framework.mixins import CreateModelMixin, ListModelMixin, DestroyModel
 from books.models import Category, Tag, Book, BookCopy, BookReview
 from books.serializers import CategorySerializer, TagSerializer, BookSerializer, BookCopySerializer, BookCopyCreateSerializer, BookReviewSerializer, BookReviewCreateSerializer, BookCreateSerializer
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from books.permissions import IsAdminOrBookCopyAuthorOrReadOnly, IsAdminOrReviewAuthor
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+from books.filters import BookFilter
 # Create your views here.
 
 # Category Model CRUD -----------------> 
@@ -14,19 +19,28 @@ from rest_framework import status
 class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes=[IsAuthenticatedOrReadOnly]
     lookup_field = 'pk'
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['name']
 
 """ Tag Model CURD --------------->     """
 
 class TagViewSet(ListModelMixin, RetrieveModelMixin, CreateModelMixin, DestroyModelMixin, GenericViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    permission_classes=[IsAuthenticatedOrReadOnly]
 
 """ Book Model CRUD ----------------->     """
 
 class BookViewSet(ModelViewSet):
     queryset = Book.objects.select_related('category').prefetch_related('tags').all()
     lookup_field = 'pk'
+    permission_classes=[IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend , SearchFilter, OrderingFilter]
+    ordering_fields = ['created_at',]
+    search_fields = ['title', 'author', ]
+    filterset_class = BookFilter
 
     def get_serializer_class(self):
         if self.request.method in ['POST', 'PUT']:
@@ -39,6 +53,11 @@ class BookViewSet(ModelViewSet):
 
 class BookCopyViewSet(ModelViewSet):
     lookup_field='pk'
+    permission_classes=[IsAdminOrBookCopyAuthorOrReadOnly]
+    filter_backends =[DjangoFilterBackend, OrderingFilter, SearchFilter]
+    filterset_fields = ['availability_status', 'book_condition']
+    ordering_fields = ['created_at']
+    search_fields = ['availability_status', 'book_condition'] #look_up automatically applied on direct fields
 
     def get_queryset(self):
         bookId = self.kwargs.get('book_pk')
@@ -57,6 +76,11 @@ class BookCopyViewSet(ModelViewSet):
 
 class BookReviewViewSet(ModelViewSet):
 
+    def get_permissions(self):
+        if self.request.method in ['PUT','PATCH', 'DELETE']:
+            return [IsAdminOrReviewAuthor()]
+        return [IsAuthenticatedOrReadOnly()]
+    
     def get_queryset(self):
         bookId =self.kwargs.get('book_pk')
         return BookReview.objects.filter(book_id = bookId)
