@@ -14,12 +14,13 @@ router.register('extensions', BorrowExtensionRequestViewSet,basename='extensions
 
 
 book_router = routers.NestedDefaultRouter(router, 'books', lookup = 'book') # '/books/<int:book_id>/
-record_router = routers.NestedDefaultRouter(router, 'borrow/records', lookup = 'record')
+record_router = routers.NestedDefaultRouter(router, 'borrow/records', lookup = 'record') # '/borrow/records/<int:record_pk>/'
 
-book_router.register('reviews', BookReviewViewSet, basename='reviews')
-book_router.register('copies', BookCopyViewSet, basename='copies')
+book_router.register('reviews', BookReviewViewSet, basename='reviews') # '/books/<int:book_id>/reviews'
+book_router.register('copies', BookCopyViewSet, basename='copies') #'/books/<int:book_id>/copies'
 
 record_router.register('extensions', BorrowExtensionRequestViewSet, basename='record-extensions' )
+    # '/borrow/records/<int:record_pk>/extensions'
 
 urlpatterns = [
     # path('books/', include('books.urls')),

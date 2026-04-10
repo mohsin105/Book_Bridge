@@ -46,7 +46,27 @@ class BookViewSet(ModelViewSet):
         if self.request.method in ['POST', 'PUT']:
             return BookCreateSerializer
         return BookSerializer
+    
+    def list(self, request, *args, **kwargs):
+        """Show All Books"""
+        return super().list(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        """Details of a Single Book"""
+        return super().retrieve(request, *args, **kwargs)
 
+    def create(self, request, *args, **kwargs):
+        """Create New Book - Only Authenticated User can create book"""
+        return super().create(request, *args, **kwargs)
+    
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+    
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+    
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
 
 """ BookCopy Model CRUD --------------->      """
 
@@ -71,6 +91,28 @@ class BookCopyViewSet(ModelViewSet):
     def perform_create(self, serializer):
         bookId = self.kwargs.get('book_pk')
         serializer.save(owner = self.request.user, book_id = bookId)
+    
+    def list(self, request, *args, **kwargs):
+        """Show All Book-Copy of a Specific Book"""
+        return super().list(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        """Details of a Single Book-Copy of a Specific Book"""
+        return super().retrieve(request, *args, **kwargs)
+    
+    # def create(self, request, *args, **kwargs):
+    #     return super().create(request, *args, **kwargs)
+    
+    def update(self, request, *args, **kwargs):
+        """Update a single Book-Copy. Only Admin and Copy-Owner are allowed"""
+        return super().update(request, *args, **kwargs)
+    
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+    
+    def destroy(self, request, *args, **kwargs):
+        """Delete a specific Book-Copy. Only Admin and Copy-Owner are allowed"""
+        return super().destroy(request, *args, **kwargs)
 
 """ BookReview Model CRUD --------------->      """
 
@@ -94,3 +136,22 @@ class BookReviewViewSet(ModelViewSet):
         bookId = self.kwargs.get('book_pk')
         bookObj = get_object_or_404(Book,pk = bookId)
         serializer.save(user = self.request.user, book = bookObj)
+    
+    def list(self, request, *args, **kwargs):
+        """Show All Book-Review of a Specific Book"""
+        return super().list(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        """Details of a Single Book-Review of a Specific Book"""
+        return super().retrieve(request, *args, **kwargs)
+    
+    def update(self, request, *args, **kwargs):
+        """Update a single Book-Review. Only Admin and Review-author are allowed"""
+        return super().update(request, *args, **kwargs)
+    
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+    
+    def destroy(self, request, *args, **kwargs):
+        """Delete a specific Book-Review. Only Admin and Review-author are allowed"""
+        return super().destroy(request, *args, **kwargs)

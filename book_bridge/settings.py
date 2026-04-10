@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'djoser',
     'django_filters',
     "corsheaders",
+    'drf_yasg',
     'users',
     'books',
     'borrow',
@@ -171,3 +172,17 @@ MEDIA_ROOT= BASE_DIR / 'media'
 
 
 BACKEND_URL = 'http://127.0.0.1:8000'
+
+
+"""Swagger Settings --------->        """
+
+SWAGGER_SETTINGS = {
+   'SECURITY_DEFINITIONS': {
+      'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description':'Enter Your JWT token in the format:`JWT <Your_token>`'
+      }
+   }
+}

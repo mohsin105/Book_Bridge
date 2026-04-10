@@ -27,11 +27,19 @@ class BorrowRequestViewSet(ModelViewSet):
     permission_classes=[IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
+        # swagger guard
+        if getattr(self,'swagger_fake_view',False):
+            return BorrowRequest.objects.none()
+
         if self.request.user.is_superuser:
             return BorrowRequest.objects.all()
         return BorrowRequest.objects.filter(Q(requested_by = self.request.user) | Q(book_copy__owner = self.request.user))
     
     def get_serializer_class(self):
+        # swagger guard
+        if getattr(self, 'swagger_fake_view', False):
+            return BorrowRequestSerializer
+        
         if self.action in ['update', 'partial_update']:
             obj = self.get_object()
             # Requested Option ---> 
@@ -99,6 +107,11 @@ class BorrowRequestViewSet(ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def sent(self, request, pk=None):
+        """
+        List of Borrow-Requests sent by the User
+        - By default: shows only Pending Requests
+        - Upon query_param status = 'all' : shows all sent-requests
+        """
         requestStatus = self.request.query_params.get('status')
         if requestStatus == 'all':
             qs = BorrowRequest.objects.filter(requested_by = self.request.user)
@@ -111,8 +124,13 @@ class BorrowRequestViewSet(ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def received(self, request, pk =None):
+        """
+        List of Borrow-Requests Received by the User
+        - By default: shows only Pending Received-Requests
+        - Upon query_param status = 'all' : shows all Received-requests
+        """
         qs = BorrowRequest.objects.filter(book_copy__owner = request.user)
-        print(qs)
+        # print(qs)
         requestStatus = self.request.query_params.get('status')
         if not requestStatus: #not 'all'
             qs = qs.filter(status = 'PENDING')
@@ -124,6 +142,33 @@ class BorrowRequestViewSet(ModelViewSet):
     # def sent_detail(self, request, pk = None):
     #     serializer = self.get_serializer(self.get_object())
     #     return Response(serializer.data)
+    def list(self, request, *args, **kwargs):
+        """List of Borrow-Requests related to the User->  Either Received or Sent"""
+        return super().list(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        """Details of a single request related to the User """
+        return super().retrieve(request, *args, **kwargs)
+    
+    def create(self, request, *args, **kwargs):
+        """Create a BorrowRequest for a Book-Copy -- Allowed to Authenticated user"""
+        return super().create(request, *args, **kwargs)
+    
+    def update(self, request, *args, **kwargs):
+
+        return super().update(request, *args, **kwargs)
+    
+    def partial_update(self, request, *args, **kwargs):
+        """
+        Partially Update a specific Borrow-Request. 
+        - Requester can only update when the Request-status is still Pending
+        - Cancel the request-status and request-message. 
+        - Book-Copy Owner can change status to Accept or Reject
+        - When Owner accepts a request, a Borrow-Record is automatically created
+        """
+        return super().partial_update(request, *args, **kwargs)
+    
+    
 
 
 # def pending_requests(request):
@@ -153,6 +198,9 @@ class BorrowRecordViewSet(ModelViewSet):
         return [IsAuthenticated()]
 
     def get_queryset(self):
+        if getattr(self,'swagger_fake_view',False):
+            return BorrowRecord.objects.none()
+
         qs= BorrowRecord.objects.filter(Q(borrower = self.request.user) | Q(owner = self.request.user))
         recordStatus = self.request.query_params.get('status')
         if recordStatus=='active': #not all, only active ones
@@ -172,6 +220,35 @@ class BorrowRecordViewSet(ModelViewSet):
         else:
             return Response(status = status.HTTP_403_FORBIDDEN)
         # return super().perform_update(serializer)
+    
+    def list(self, request, *args, **kwargs):
+        """List of Borrow-Requests related to the User->  Either Borrowed or Lent"""
+        return super().list(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        """Details of Specific borrow-record - related to the User"""
+        return super().retrieve(request, *args, **kwargs)
+    
+    def create(self, request, *args, **kwargs):
+        """Manually Create a Borrow-record: Allowed only for Admin"""
+        return super().create(request, *args, **kwargs)
+    
+    def update(self, request, *args, **kwargs):
+        """Update a Borrow-Record
+        - Only Owner can change the status to Returned
+        - Admin has full access
+        """
+        return super().update(request, *args, **kwargs)
+    
+    def partial_update(self, request, *args, **kwargs):
+        """
+        Update a Borrow-Record
+        - Only Owner can change the status to Returned
+        - Admin has full access
+        """
+        return super().partial_update(request, *args, **kwargs)
+    
+
 
 
 """ BorrowExtensionRequest CRUD operatoins-------->   """
@@ -189,6 +266,9 @@ class BorrowExtensionRequestViewSet(ModelViewSet):
     permission_classes=[IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
+        if getattr(self,'swagger_fake_view',False):
+            return BorrowExtensionRequest.objects.none()
+        
         recordObj = self.kwargs.get('record_pk')
         user = self.request.user
         qs = BorrowExtensionRequest.objects.filter(
@@ -262,6 +342,34 @@ class BorrowExtensionRequestViewSet(ModelViewSet):
                 )
             serializer.save()
         # return super().perform_update(serializer)
+    def list(self, request, *args, **kwargs):
+        """List of BorrowExtension Request- of a specific Borrow-Record
+        - Only Admin or Record owner or borrower can access
+        """
+        return super().list(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        """Details of a specific BorrowExtension Request- of a specific Borrow-Record
+        - Only Admin or Record owner or borrower can access
+        """
+        return super().retrieve(request, *args, **kwargs)
+    
+    def create(self, request, *args, **kwargs):
+        """
+        Create a  BorrowExtension Request for a specific Borrow-Record
+        - Only the borrower of that record can create extension-request
+        """
+        return super().create(request, *args, **kwargs)
+    
+    def partial_update(self, request, *args, **kwargs):
+        """
+        Partially Update a specific Extension-Request. 
+        - Requester can only update when the Request-status is still Pending
+        - Cancel the request-status and request-message. 
+        - Book-Copy Owner can change status to Accept or Reject
+        - When Owner accepts a request, a Borrow-Record is automatically updated. Due-date and extension_request_count changed
+        """
+        return super().partial_update(request, *args, **kwargs)
 
 # class SpecificPendingExtensionRequest(RetrieveUpdateAPIView):
 
