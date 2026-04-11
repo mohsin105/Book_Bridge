@@ -12,7 +12,7 @@ class SimpleCustomUser(serializers.ModelSerializer):
         fields = ['id','first_name', 'last_name', 'email']
 
 class UserSerializer(BaseUserSerializer):
-
+    profile_image = serializers.ImageField(required=False, allow_null=True)
     class Meta(BaseUserSerializer.Meta):
         ref_name = 'CustomUser'
         fields = ['id','email', 'first_name', 'last_name','bio', 'address', 'phone_number', 'profile_image', 'rating', 'late_return' ]

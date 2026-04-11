@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from users.managers import CustomUserManager
+from cloudinary.models import CloudinaryField
 # Create your models here.
 
 class User(AbstractUser):
@@ -10,7 +11,14 @@ class User(AbstractUser):
     bio = models.TextField(blank=True, null=True)
     address = models.CharField(max_length=200, blank=True, null=True)
     phone_number = models.CharField(max_length=18, blank=True, null=True)
-    profile_image = models.ImageField(upload_to='profile_images/',blank=True, null=True, default='profile_images/default_profile.jpg')
+    profile_image = CloudinaryField(
+        'image',
+        folder = 'profile_images',
+        blank=True, 
+        null=True,
+        default='profile_images/default_profile'
+    )
+    # profile_image = models.ImageField(upload_to='profile_images/',blank=True, null=True, default='profile_images/default_profile.jpg')
     rating  = models.PositiveIntegerField(
         default=1,
         validators=[MinValueValidator(1),MaxValueValidator(5)],

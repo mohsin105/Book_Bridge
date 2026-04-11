@@ -1,6 +1,9 @@
 from pathlib import Path
 from datetime import timedelta
 from decouple import config
+import cloudinary
+import cloudinary.uploader
+from cloudinary.utils import cloudinary_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -15,9 +18,9 @@ AUTH_USER_MODEL = 'users.User'
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [".vercel.app", "127.0.0.1"]
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
@@ -27,6 +30,7 @@ CORS_ALLOWED_ORIGINS = [
 # Application definition
 
 INSTALLED_APPS = [
+    "whitenoise.runserver_nostatic",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,6 +52,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware", #for WhiteNoise
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -73,7 +78,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'book_bridge.wsgi.application'
+WSGI_APPLICATION = 'book_bridge.wsgi.app'  #changed when deploying to vercel
 
 
 # Database
@@ -88,16 +93,39 @@ WSGI_APPLICATION = 'book_bridge.wsgi.application'
 
 
 # Postgreql - Local
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'book_bridge',
+#         'USER': 'postgres',
+#         'PASSWORD': '123456',
+#         'HOST': 'localhost',
+#         'PORT': '5432'
+#     }
+# }
+
+# PostgresQl - Supabase
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'book_bridge',
-        'USER': 'postgres',
-        'PASSWORD': '123456',
-        'HOST': 'localhost',
-        'PORT': '5432'
+        'NAME': config('database'),
+        'USER': config('user'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('host'),
+        'PORT': config('port')
     }
 }
+
+# Cloudinary -------> 
+# Configuration       
+cloudinary.config( 
+    cloud_name = config("CLOUD_NAME"), 
+    api_key = config("CLOUDINARY_API_KEY"), 
+    api_secret = config("CLOUDINARY_API_SECRET"), # Click 'View API Keys' above to copy your API secret
+    secure=True
+)
+
+DEFAULT_FILE_STORAGE='cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
 
@@ -166,6 +194,10 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD',default='')
 """ Media & Static related settings -------->   """
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / "staticfiles"  #added during WhiteNoise integration
+STATIC_FILES_DIRS=BASE_DIR/'static'     #added during WhiteNoise integration
+STATICFILES_STORAGE="whitenoise.storage.CompressedStaticFilesStorage"
+
 
 MEDIA_URL='/media/'
 MEDIA_ROOT= BASE_DIR / 'media'

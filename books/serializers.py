@@ -15,6 +15,7 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ['id','name']
 
 class BookSerializer(serializers.ModelSerializer):
+    cover_image = serializers.ImageField()
     category = CategorySerializer()
     tags = TagSerializer(many = True)
     class Meta:
@@ -24,13 +25,15 @@ class BookSerializer(serializers.ModelSerializer):
     
 
 class BookCreateSerializer(serializers.ModelSerializer):
+    cover_image = serializers.ImageField(required=False, allow_null=True)
     class Meta:
         model = Book
         fields = ['id','title','category', 'tags', 'author', 'page_count', 'description', 'cover_image']
     
     def create(self, validated_data):
         if not validated_data.get('cover_image'):
-            validated_data['cover_image'] = 'book_cover/default_cover.png'
+            # validated_data['cover_image'] = 'book_cover/default_cover.png'
+            validated_data['cover_image'] = 'https://res.cloudinary.com/dxfk4kicy/image/upload/q_auto/f_auto/v1775883474/default_cover_szywna.png'
         return super().create(validated_data)
 
 class SimpleBookSerializer(serializers.ModelSerializer):

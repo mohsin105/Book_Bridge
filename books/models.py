@@ -1,6 +1,7 @@
 from django.db import models
 from users.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from cloudinary.models import CloudinaryField
 # Create your models here.
 class Category(models.Model):
     name = models.CharField(max_length=60, unique=True)
@@ -25,7 +26,14 @@ class Book(models.Model):
     author = models.CharField(max_length=100)
     description = models.TextField()
     page_count = models.PositiveIntegerField(blank=True, null=True)
-    cover_image = models.ImageField(upload_to='book_cover/', blank=True, null=True, default='book_cover/default_cover.png')
+    cover_image = CloudinaryField(
+        'image', 
+        folder='book_cover',
+        blank=True, 
+        null=True, 
+        default='book_cover/default_cover'
+    )
+    # cover_image = models.ImageField(upload_to='book_cover/', blank=True, null=True, default='book_cover/default_cover.png')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
