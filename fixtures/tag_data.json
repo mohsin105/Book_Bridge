@@ -1,0 +1,322 @@
+[
+  {
+    "model": "books.tag",
+    "pk": 2,
+    "fields": {
+      "name": "Fiction",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 3,
+    "fields": {
+      "name": "Non-Fiction",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 4,
+    "fields": {
+      "name": "Mystery",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 5,
+    "fields": {
+      "name": "Thriller",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 6,
+    "fields": {
+      "name": "Romance",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 7,
+    "fields": {
+      "name": "Fantasy",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 8,
+    "fields": {
+      "name": "Horror",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 9,
+    "fields": {
+      "name": "Biography",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 10,
+    "fields": {
+      "name": "History",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 11,
+    "fields": {
+      "name": "Self-Help",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 12,
+    "fields": {
+      "name": "Philosophy",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 13,
+    "fields": {
+      "name": "Psychology",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 14,
+    "fields": {
+      "name": "Technology",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 15,
+    "fields": {
+      "name": "Programming",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 16,
+    "fields": {
+      "name": "Mathematics",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 17,
+    "fields": {
+      "name": "Economics",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 18,
+    "fields": {
+      "name": "Politics",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 19,
+    "fields": {
+      "name": "Religion",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 20,
+    "fields": {
+      "name": "Travel",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 21,
+    "fields": {
+      "name": "Adventure",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 22,
+    "fields": {
+      "name": "Dystopian",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 23,
+    "fields": {
+      "name": "Science Fiction",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 24,
+    "fields": {
+      "name": "Classic",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 25,
+    "fields": {
+      "name": "Young Adult",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 26,
+    "fields": {
+      "name": "Children",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 27,
+    "fields": {
+      "name": "Graphic Novel",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 28,
+    "fields": {
+      "name": "Poetry",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 29,
+    "fields": {
+      "name": "Short Stories",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 30,
+    "fields": {
+      "name": "Memoir",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 31,
+    "fields": {
+      "name": "Health & Wellness",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 32,
+    "fields": {
+      "name": "Business",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 33,
+    "fields": {
+      "name": "Law",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 34,
+    "fields": {
+      "name": "Art & Design",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 35,
+    "fields": {
+      "name": "Music",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 36,
+    "fields": {
+      "name": "Sports",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 37,
+    "fields": {
+      "name": "Environment",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 38,
+    "fields": {
+      "name": "Parenting",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 39,
+    "fields": {
+      "name": "Cooking",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 40,
+    "fields": {
+      "name": "Architecture",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "books.tag",
+    "pk": 41,
+    "fields": {
+      "name": "Linguistics",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  }
+]

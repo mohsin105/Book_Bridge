@@ -45,10 +45,18 @@ class BookCopySerializer(serializers.ModelSerializer):
     # book = serializers.StringRelatedField()
     book = SimpleBookSerializer()
     owner = SimpleCustomUser()
+    availability_status_display = serializers.SerializerMethodField(method_name='get_availability_status_display')
+    book_condition_display = serializers.SerializerMethodField(method_name='get_book_condition_display')
     class Meta:
         model = BookCopy
-        fields = ['id', 'book', 'owner', 'availability_status', 'book_condition', 'note', 'created_at', 'updated_at']
+        fields = ['id', 'book', 'owner', 'availability_status','availability_status_display', 'book_condition','book_condition_display', 'note', 'created_at', 'updated_at']
         read_only_fields = ['book','created_at', 'updated_at']
+    
+    def get_availability_status_display(self, obj):
+        return obj.get_availability_status_display()
+    
+    def get_book_condition_display(self,obj):
+        return obj.get_book_condition_display()
 
 class BookCopyCreateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -58,9 +66,18 @@ class BookCopyCreateSerializer(serializers.ModelSerializer):
 class SimpleBookCopySerializer(serializers.ModelSerializer):
     book = SimpleBookSerializer()
     owner = SimpleCustomUser()
+    availability_status_display = serializers.SerializerMethodField(method_name='get_availability_status_display')
+    book_condition_display = serializers.SerializerMethodField(method_name='get_book_condition_display')
     class Meta:
         model = BookCopy
-        fields = ['id', 'book', 'owner', 'availability_status', 'book_condition', 'note',]
+        fields = ['id', 'book', 'owner', 'availability_status','availability_status_display', 'book_condition','book_condition_display', 'note',]
+    
+    def get_availability_status_display(self, obj):
+        return obj.get_availability_status_display()
+    
+    def get_book_condition_display(self,obj):
+        return obj.get_book_condition_display()
+
 
 class BookReviewSerializer(serializers.ModelSerializer):
     book = SimpleBookSerializer()

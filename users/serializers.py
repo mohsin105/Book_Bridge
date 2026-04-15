@@ -19,6 +19,10 @@ class UserSerializer(BaseUserSerializer):
         read_only_fields = ['email', 'rating','late_return']
 
 class NotificationSerializer(serializers.ModelSerializer):
+    notification_type_display = serializers.SerializerMethodField(method_name='get_notification_type_display')
     class Meta:
         model = Notification
-        fields = ['id', 'notification_type', 'actor', 'receiver_user', 'message', 'link', 'is_read', 'created_at', 'updated_at']
+        fields = ['id', 'notification_type', 'notification_type_display' ,'actor', 'receiver_user', 'message', 'link', 'is_read', 'created_at', 'updated_at']
+    
+    def get_notification_type_display(self, obj):
+        return obj.get_notification_type_display()

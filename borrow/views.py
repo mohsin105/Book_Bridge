@@ -14,6 +14,7 @@ from django.conf import settings
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser,IsAuthenticated
 from borrow.permissions import IsAdminOrRecordOwner
+from rest_framework.filters import OrderingFilter
 
 """  BorrowRequest CRUD operations ---------->   """
 
@@ -25,6 +26,8 @@ from borrow.permissions import IsAdminOrRecordOwner
 class BorrowRequestViewSet(ModelViewSet):
     lookup_field='pk'
     permission_classes=[IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    ordering_fields = ['created_at', 'updated_at']
 
     def get_queryset(self):
         # swagger guard
@@ -32,8 +35,8 @@ class BorrowRequestViewSet(ModelViewSet):
             return BorrowRequest.objects.none()
 
         if self.request.user.is_superuser:
-            return BorrowRequest.objects.all()
-        return BorrowRequest.objects.filter(Q(requested_by = self.request.user) | Q(book_copy__owner = self.request.user))
+            return BorrowRequest.objects.all().order_by('-created_at')
+        return BorrowRequest.objects.filter(Q(requested_by = self.request.user) | Q(book_copy__owner = self.request.user)).order_by('-created_at')
     
     def get_serializer_class(self):
         # swagger guard
@@ -63,7 +66,7 @@ class BorrowRequestViewSet(ModelViewSet):
             actor = self.request.user,
             receiver_user = owner,
             message = f'{self.request.user} has requested {bookCopyObj.book.title} from you',
-            link = f'{settings.BACKEND_URL}/api/v1/borrow/user/pending-requests/{requestObj.id}/'
+            link = f'{settings.BACKEND_URL}/api/v1/borrow/requests/{requestObj.id}'
         )
     
     def perform_update(self, serializer):
@@ -100,7 +103,7 @@ class BorrowRequestViewSet(ModelViewSet):
                     actor = self.request.user,
                     receiver_user = requestObj.requested_by,
                     message = f'{self.request.user} rejected your request for book {requestObj.book_copy.book.title}',
-                    link = f'{settings.BACKEND_URL}/api/v1/borrow/{requestObj.id}'
+                    link = f'{settings.BACKEND_URL}/api/v1/borrow/requests/{requestObj.id}'
                 )
             # print("Record should be created by now")
             serializer.save()
@@ -114,9 +117,9 @@ class BorrowRequestViewSet(ModelViewSet):
         """
         requestStatus = self.request.query_params.get('status')
         if requestStatus == 'all':
-            qs = BorrowRequest.objects.filter(requested_by = self.request.user)
+            qs = BorrowRequest.objects.filter(requested_by = self.request.user).order_by('-created_at')
         else:
-            qs = BorrowRequest.objects.filter(requested_by = self.request.user, status = 'PENDING')
+            qs = BorrowRequest.objects.filter(requested_by = self.request.user, status = 'PENDING').order_by('-created_at')
         # serializer = self.get_serializer(qs, many = True)
         serializer = BorrowRequestSerializer(qs, many = True)
         # return Response({'message':'action checking', 'status':requestStatus})

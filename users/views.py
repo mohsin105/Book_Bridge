@@ -12,8 +12,8 @@ class NotificationListView(ListAPIView):
 
     def get_queryset(self):
         if self.request.user.is_superuser:
-            return Notification.objects.all()
-        return Notification.objects.filter(receiver_user = self.request.user)
+            return Notification.objects.all().order_by('-created_at')
+        return Notification.objects.filter(receiver_user = self.request.user).order_by('-created_at')
 
 class UserDashboard(APIView):
     def get(self, request, *args, **kwargs):

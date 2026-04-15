@@ -1,0 +1,4 @@
+- 
+    - added fixtures book category tag fixtures
+    - edited CORS_ALLOWED_ORIGINS for vercel domain
+    - Updated choices-fields (status fields, dropdown option). Sending frontend-friendly values too, from serializers . using get_status_display() in serializer. 
