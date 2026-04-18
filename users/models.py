@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from users.managers import CustomUserManager
 from cloudinary.models import CloudinaryField
+# from borrow.models import BorrowRecord #this line causes circular import error. 
 # Create your models here.
 
 class User(AbstractUser):
@@ -38,7 +39,7 @@ class User(AbstractUser):
 # class UserReview(models.Model):
 #     reviewed_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviewed_user_list')
 #     reviewed_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_reviews')
-#     borrow_record = models.ForeignKey(, on_delete=models.CASCADE,related_name='review_list')
+#     borrow_record = models.ForeignKey(BorrowRecord, on_delete=models.CASCADE,related_name='review_list')
 #     rating = models.PositiveIntegerField(
 #         validators=[MinValueValidator(1), MaxValueValidator(5)]
 #     )

@@ -15,6 +15,16 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser,IsAuthenticated
 from borrow.permissions import IsAdminOrRecordOwner
 from rest_framework.filters import OrderingFilter
+from rest_framework.exceptions import PermissionDenied
+
+def overdue_count(user):
+    return BorrowRecord.objects.filter(transaction_status='OVERDUE', borrower = user).count()
+
+def active_record_count(user):
+    return BorrowRecord.objects.filter(transaction_status='ACTIVE', borrower = user).count()
+
+def extension_request_count(user, recordObj):
+    return BorrowExtensionRequest.objects.filter(extension_status = 'ACCEPTED', requested_by = user, borrow_record = recordObj )
 
 """  BorrowRequest CRUD operations ---------->   """
 
@@ -58,6 +68,16 @@ class BorrowRequestViewSet(ModelViewSet):
         # if self.request.method in ['POST','PUT']:
     
     def perform_create(self, serializer):
+        if overdue_count(self.request.user)>0:
+            raise PermissionDenied("Request Failed!! You have overdue records. Please clear dues first. ")
+        
+        if active_record_count(self.request.user)>=2:
+            raise PermissionDenied("You cannot have more than two books at the same time")
+        
+        serializerStatus = serializer.validated_data.get('status')
+        if serializerStatus and serializerStatus not in ['PENDING']:
+            raise PermissionDenied("User can only request with status Pending")
+        
         requestObj = serializer.save(requested_by = self.request.user)
         bookCopyObj = serializer.validated_data.get('book_copy')
         owner = bookCopyObj.owner
@@ -71,14 +91,14 @@ class BorrowRequestViewSet(ModelViewSet):
     
     def perform_update(self, serializer):
         requestObj = self.get_object()
-        # print('Requester Update Form: ',serializer.validated_data)
+        print('Requester Update Form: ',serializer.validated_data)
         # Borrower options-> 
         if self.request.user == requestObj.requested_by:
             # print('this is the requester')
             serializerStatus = serializer.validated_data.get('status')
             if serializerStatus and serializerStatus not in ['CANCELLED', 'PENDING']:
                 # print('not pending nor cancelled')
-                return Response(status = status.HTTP_403_FORBIDDEN)
+                raise PermissionDenied("Your are not allowed to perform this operation!")
             serializer.save()
         
         # Owner Options  -> 
@@ -221,7 +241,7 @@ class BorrowRecordViewSet(ModelViewSet):
         if self.request.user == recordObj.owner:
             serializer.save()
         else:
-            return Response(status = status.HTTP_403_FORBIDDEN)
+            raise PermissionDenied("Borrower Cannot Update the Record")
         # return super().perform_update(serializer)
     
     def list(self, request, *args, **kwargs):
@@ -293,6 +313,8 @@ class BorrowExtensionRequestViewSet(ModelViewSet):
     def perform_create(self, serializer):
         recordId = self.kwargs.get('record_pk')
         recordObj = get_object_or_404(BorrowRecord, pk = recordId)
+        if extension_request_count(self.request.user, recordObj)>=2:
+            raise PermissionDenied("Maximum 2 accepted extensions allowed. ")
         requested_date = recordObj.due_date + timedelta(days=7)
         requestObj=serializer.save(
             requested_by = self.request.user, 
@@ -315,15 +337,15 @@ class BorrowExtensionRequestViewSet(ModelViewSet):
         # borrower side
         if requestObj.requested_by == self.request.user:
             if requestObj.extension_status == 'REJECTED':
-                return Response(status= status.HTTP_403_FORBIDDEN)
+                raise PermissionDenied("You cannot change an already Rejected request. ")
             if submittedStatus and submittedStatus not in ['CANCELLED', 'PENDING']:
-                return Response(status = status.HTTP_403_FORBIDDEN)
+                raise PermissionDenied("Your are not allowed to perform this operation!")
             serializer.save()
         
         # owner side -> 
         elif recordObj.owner == self.request.user:
             if submittedStatus and submittedStatus not in ['ACCEPTED', 'REJECTED']:
-                return Response(status=status.HTTP_403_FORBIDDEN)
+                raise PermissionDenied("Owner can only Accept or Reject the request")
             if serializer.validated_data.get('extension_status') == 'ACCEPTED':
                 recordObj.extension_request_count += 1
                 recordObj.due_date = requestObj.requested_due_date

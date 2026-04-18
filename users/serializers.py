@@ -26,3 +26,16 @@ class NotificationSerializer(serializers.ModelSerializer):
     
     def get_notification_type_display(self, obj):
         return obj.get_notification_type_display()
+    
+
+# UserReviewSerializers--------> 
+
+# class UserReviewSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = UserReview
+#         fields = ['id', 'reviewed_by', 'reviewed_user', 'borrow_record', 'rating', 'comment', 'created_at', 'updated_at']
+
+# class UserReviewCreateSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = UserReview
+#         fields = ['id', 'rating', 'comment']
